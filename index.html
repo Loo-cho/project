@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Piatti</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e7f7e7;
+            border-radius: 4px;
+        }
+
+        .result p {
+            margin: 0;
+        }
+
+        .recipe-list {
+            margin-top: 20px;
+        }
+
+        .recipe-item {
+            background-color: #fafafa;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Gestione Piatti e Ricette</h1>
+
+    <div class="container">
+
+        <!-- Aggiungi un nuovo piatto -->
+        <div class="form-group">
+            <h3>Aggiungi un Nuovo Piatto</h3>
+            <label for="nome-piatto">Nome del Piatto:</label>
+            <input type="text" id="nome-piatto" placeholder="Nome del piatto">
+            <label for="ricetta">Ricetta:</label>
+            <textarea id="ricetta" rows="5" placeholder="Descrivi la ricetta"></textarea>
+            <button id="aggiungi-piatto">Aggiungi Piatto</button>
+        </div>
+
+        <!-- Cerca un piatto per nome -->
+        <div class="form-group">
+            <h3>Cerca Piatto per Nome</h3>
+            <label for="ricerca-nome">Nome del Piatto:</label>
+            <input type="text" id="ricerca-nome" placeholder="Cerca piatto per nome">
+            <button id="cerca-piatto">Cerca</button>
+        </div>
+
+        <!-- Visualizza tutte le ricette -->
+        <div class="form-group">
+            <h3>Visualizza tutte le Ricette</h3>
+            <button id="visualizza-ricette">Mostra Ricette</button>
+        </div>
+
+        <!-- Risultati della ricerca e delle operazioni -->
+        <div id="result" class="result"></div>
+        <div id="ricette-list" class="recipe-list"></div>
+
+    </div>
+
+    <script>
+        // Funzione per aggiungere un piatto
+        document.getElementById('aggiungi-piatto').addEventListener('click', function() {
+            const nomePiatto = document.getElementById('nome-piatto').value;
+            const ricetta = document.getElementById('ricetta').value;
+
+            if (!nomePiatto || !ricetta) {
+                alert('Inserisci sia il nome del piatto che la ricetta!');
+                return;
+            }
+
+            fetch('http://127.0.0.1:5000/api/piatti', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    nome: nomePiatto,
+                    ricetta: ricetta
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').innerHTML = `<p>Nuovo piatto aggiunto: ${data.nome}</p>`;
+            })
+            .catch(error => {
+                console.error('Errore:', error);
+            });
+        });
+
+        // Funzione per cercare un piatto per nome
+        document.getElementById('cerca-piatto').addEventListener('click', function() {
+            const nomePiatto = document.getElementById('ricerca-nome').value;
+
+            if (!nomePiatto) {
+                alert('Inserisci un nome di piatto per la ricerca!');
+                return;
+            }
+
+            fetch(`http://127.0.0.1:5000/api/piatti/${nomePiatto}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    const piatti = data.map(piatto => `
+                        <div class="recipe-item">
+                            <h4>${piatto.nome}</h4>
+                            <p>${piatto.ricetta}</p>
+                        </div>
+                    `).join('');
+                    document.getElementById('result').innerHTML = '';
+                    document.getElementById('ricette-list').innerHTML = piatti;
+                } else {
+                    document.getElementById('result').innerHTML = 'Nessun piatto trovato!';
+                    document.getElementById('ricette-list').innerHTML = '';
+                }
+            })
+            .catch(error => {
+                console.error('Errore:', error);
+            });
+        });
+
+        // Funzione per visualizzare tutte le ricette
+        document.getElementById('visualizza-ricette').addEventListener('click', function() {
+            fetch('http://127.0.0.1:5000/api/ricette')
+            .then(response => response.json())
+            .then(data => {
+                const ricette = data.map(ricetta => `
+                    <div class="recipe-item">
+                        <h4>${ricetta.nome}</h4>
+                        <p>${ricetta.ricetta}</p>
+                    </div>
+                `).join('');
+                document.getElementById('ricette-list').innerHTML = ricette;
+            })
+            .catch(error => {
+                console.error('Errore:', error);
+            });
+        });
+    </script>
+</body>
+</html>

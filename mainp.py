@@ -1,60 +1,69 @@
-#prova merge
-from flask import Flask, render_template, request
-from flask_sqlalchemy import SQLAlchemy
-import models as m
+from flask import Flask, request, jsonify
+from models import db, ma, Piatto, Ingrediente, Ricetta, PiattoSchema, IngredienteSchema, RicettaSchema
+from config import Config
 
+# Crea l'applicazione Flask
 app = Flask(__name__)
+app.config.from_object(Config)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mariadb+mariadbconnector://root@127.0.0.1:3306/project'
+# Inizializza SQLAlchemy e Marshmallow
+db.init_app(app)
+ma.init_app(app)
 
-m.sa.init_app(app)
+# API per cercare un piatto per nome
+@app.route('/api/piatti/<string:nome>', methods=['GET'])
+def get_piatto_by_name(nome):
+    piatto = Piatto.query.filter(Piatto.nome.ilike(f'%{nome}%')).first()
+    if piatto is None:
+        return jsonify({"message": "Piatto non trovato"}), 404
+    piatto_schema = PiattoSchema()
+    return piatto_schema.jsonify(piatto)
 
-with app.app_context():
-    m.sa.create_all()
 
-# Lista json
-@app.route('/lista_ricette_cond', methods=['GET'])
-def listaRicetteCond():
-    data = m.Ricetta.query.all()
-
-    lista_dict = [
-        {
-            'id': item.idStudente,
-            'nome': item.nome,
-            'cognome': item.cognome,
-            'dataDiNascita': item.dataDiNascita
-        }
-        for item in data
-    ]
-
-    return lista_dict
-
-@app.route("/find/<int:id_ricetta>", methods=['PATCH'])
-def findRicettaId(id_ricetta):
-
-    ricetta=m.Ricetta.query.get(id=id_ricetta) #un solo  elemento, posso usare get
+@app.route('/api/piatti', methods=['POST'])
+def add_piatto():
+    data = request.get_json()
+    nome = data.get('nome')
+    ricetta = data.get('ricetta')
     
-    return redirect ( url_for( 'index'))
+    if not nome or not ricetta:
+        return jsonify({"message": "Nome e ricetta sono richiesti"}), 400
+    
+    nuovo_piatto = Piatto(nome=nome, ricetta=ricetta)
+    
+    db.session.add(nuovo_piatto)
+    db.session.commit()
+    
+    piatto_schema = PiattoSchema()
+    return piatto_schema.jsonify(nuovo_piatto), 201
 
-@app.route('/')
-def index():
-    data = m.Ricetta.query.all()
+@app.route('/api/piatti/ingredienti', methods=['GET'])
+def get_piatto_by_ingredienti():
+    ingredienti = request.args.getlist('ingrediente')
+    if not ingredienti:
+        return jsonify({"message": "Inserisci almeno un ingrediente"}), 400
+    
+    piatti = db.session.query(Piatto).join(Ricetta).join(Ingrediente).filter(Ingrediente.nome.in_(ingredienti)).all()
+    
+    if not piatti:
+        return jsonify({"message": "Nessun piatto trovato con questi ingredienti"}), 404
+    
+    piatti_schema = PiattoSchema(many=True)
+    return piatti_schema.jsonify(piatti)
 
-    lista_dict = [
-        {
-            'id': item.idStudente,
-            'nome': item.nome,
-            'cognome': item.cognome,
-            'dataDiNascita': item.dataDiNascita
-        }
-        for item in data
-    ]
+@app.route('/api/piatti', methods=['GET'])
+def get_all_ricetti():
 
-    return lista_dict
+    piatto = Piatto.query.all()
+    
+    if not piatto:
+        return jsonify({"message": "Nessun piatto trovato"}), 404
 
+
+    piatto_schema = PiattoSchema(many=True)
+    return piatto_schema.jsonify(piatto)
 
 
 if __name__ == '__main__':
     app.run(debug=True)
-
 

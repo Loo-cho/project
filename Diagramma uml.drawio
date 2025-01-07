@@ -1,0 +1,43 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36" version="26.0.4">
+  <diagram name="Page-1" id="2YBvvXClWsGukQMizWep">
+    <mxGraphModel dx="794" dy="459" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="5EQqltgdB87XO-r36Bmb-12" value="" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="180" y="230" width="520" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="5EQqltgdB87XO-r36Bmb-3" value="cerca in base agli ingredienti" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="355" y="310" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="5EQqltgdB87XO-r36Bmb-5" value="visualizza lista piatti" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="310" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="5EQqltgdB87XO-r36Bmb-7" value="cerca piatto in base al nome" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="510" y="310" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="5EQqltgdB87XO-r36Bmb-13" value="utente" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="410" y="540" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="5EQqltgdB87XO-r36Bmb-14" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.192;entryY=0.6;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="5EQqltgdB87XO-r36Bmb-13" target="5EQqltgdB87XO-r36Bmb-12">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="380" y="510" as="sourcePoint" />
+            <mxPoint x="430" y="460" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="5EQqltgdB87XO-r36Bmb-15" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.481;entryY=0.6;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" target="5EQqltgdB87XO-r36Bmb-12">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="420" y="540" as="sourcePoint" />
+            <mxPoint x="430" y="460" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="5EQqltgdB87XO-r36Bmb-16" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.769;entryY=0.6;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" target="5EQqltgdB87XO-r36Bmb-12">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="420" y="540" as="sourcePoint" />
+            <mxPoint x="430" y="460" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

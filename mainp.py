@@ -1,36 +1,40 @@
 from flask import Flask, request, jsonify
-from models import db, ma, Piatto, Ingrediente, Ricetta, PiattoSchema, IngredienteSchema, RicettaSchema
+import models as m
 from config import Config
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
-db.init_app(app)
-ma.init_app(app)
+m.db.init_app(app)
+m.ma.init_app(app)
 
 
 #lista piatti iniziale
 @app.route('/piatti', methods=['GET'])
 def get_all_ricette():
 
-    piatto = Piatto.query.all()
+    piatto = m.Piatto.query.all()
     
     if not piatto:
         return jsonify({"message": "Nessun piatto trovato"}), 404
 
 
-    piatto_schema = PiattoSchema(many=True)
+    piatto_schema = m.PiattoSchema(many=True)
     return piatto_schema.jsonify(piatto)
 
 
 #piatto tramite nome
 @app.route('/piatti/<string:nome>', methods=['GET'])
 def get_piatto_by_name(nome):
-    piatto = Piatto.query.filter(Piatto.nome.ilike(f'%{nome}%')).first()
-    if piatto is None:
-        return jsonify({"message": "Piatto non trovato"}), 404
-    piatto_schema = PiattoSchema()
-    return piatto_schema.jsonify(piatto)
+
+    piatti = m.db.session.query(m.Piatto).join(m.Ricetta).join(m.Ingrediente).filter(m.Piatto.nome.ilike(f'%{nome}%')).all()
+
+    if not piatti:
+        return jsonify({"message": "Nessun piatto trovato con questo nome"}), 404
+    
+    ricetta_schema = m.RicettaSchema(many=True)
+    return ricetta_schema.jsonify(piatti)
+
 
 
 #cerca piatto tramite ingredienti
@@ -40,16 +44,16 @@ def get_piatto_by_ingredienti():
     if not ingredienti:
         return jsonify({"message": "Inserisci almeno un ingrediente"}), 400
     
-    piatti = db.session.query(Piatto).join(Ricetta).join(Ingrediente).filter(Ingrediente.nome.in_(ingredienti)).all()
+    piatti = m.db.session.query(m.Piatto).join(m.Ricetta).join(m.Ingrediente).filter(m.Ingrediente.nome.in_(ingredienti)).all()
     
     if not piatti:
         return jsonify({"message": "Nessun piatto trovato con questi ingredienti"}), 404
     
-    piatti_schema = PiattoSchema(many=True)
+    piatti_schema = m.PiattoSchema(many=True)
     return piatti_schema.jsonify(piatti)
 
 
-#aggiugngi piatto
+#aggiungi piatto
 @app.route('/piatti/add', methods=['POST'])
 def add_piatto():
     data = request.get_json()
@@ -59,12 +63,12 @@ def add_piatto():
     if not nome or not ricetta:
         return jsonify({"message": "Nome e ricetta sono richiesti"}), 400
     
-    nuovo_piatto = Piatto(nome=nome, ricetta=ricetta)
+    nuovo_piatto = m.Piatto(nome=nome, ricetta=ricetta)
     
-    db.session.add(nuovo_piatto)
-    db.session.commit()
+    m.db.session.add(nuovo_piatto)
+    m.db.session.commit()
     
-    piatto_schema = PiattoSchema()
+    piatto_schema = m.PiattoSchema()
     return piatto_schema.jsonify(nuovo_piatto), 201
 
 
